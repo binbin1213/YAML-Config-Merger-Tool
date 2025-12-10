@@ -1,0 +1,5 @@
+{
+  "name": "Mihomo Config Merger",
+  "description": "一个用于将个人 Clash/Mihomo 代理节点合并到结构化 YAML 模版中的工具。",
+  "requestFramePermissions": []
+}
