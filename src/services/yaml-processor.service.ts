@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 
 // Declare global jsyaml from the CDN script
+<<<<<<< HEAD
 declare const jsyaml: any;
 
 export interface MihomoConfig {
@@ -13,17 +14,107 @@ export interface MihomoConfig {
 }
 
 @Injectable({
+=======
+interface JsYamlOptions {
+  lineWidth?: number;
+  noRefs?: boolean;
+  quotingType?: string;
+  sortKeys?: (a: string, b: string) => number;
+}
+
+interface JsYaml {
+  load(content: string): MihomoConfig;
+  dump(content: MihomoConfig, options?: JsYamlOptions): string;
+}
+
+declare const jsyaml: JsYaml;
+
+export interface MihomoProxy {
+  name: string;
+  type: string;
+  [key: string]: unknown; // 允许其他任意属性
+}
+
+export interface MihomoProxyGroup {
+  name: string;
+  type: string;
+  proxies?: string[];
+  url?: string;
+  interval?: number;
+  lazy?: boolean;
+  filter?: string;
+  'include-all'?: boolean;
+  'policy-priority'?: string;
+  uselightgbm?: boolean;
+  collectdata?: boolean;
+  [key: string]: unknown; // 允许其他任意属性
+}
+
+export interface MihomoHealthCheck {
+  enable?: boolean;
+  url?: string;
+  interval?: number;
+}
+
+export interface MihomoProxyProvider {
+  url: string;
+  type: string;
+  interval: number;
+  'health-check'?: MihomoHealthCheck;
+  proxy?: string;
+  [key: string]: unknown; // 允许其他任意属性
+}
+
+export type MihomoDnsConfig = Record<string, unknown>;
+
+export interface MihomoConfig {
+  proxies?: MihomoProxy[];
+  'proxy-groups'?: MihomoProxyGroup[];
+  'proxy-providers'?: Record<string, MihomoProxyProvider>;
+  rules?: string[];
+  port?: number;
+  'socks-port'?: number;
+  'redir-port'?: number;
+  'mixed-port'?: number;
+  'tproxy-port'?: number;
+  'allow-lan'?: boolean;
+  'bind-address'?: string;
+  mode?: string;
+  'log-level'?: string;
+  ipv6?: boolean;
+  'external-controller'?: string;
+  'external-ui'?: string;
+  secret?: string;
+  profile?: unknown;
+  dns?: MihomoDnsConfig;
+  tun?: unknown;
+  experiments?: unknown;
+  'sub-rules'?: unknown;
+  'rule-providers'?: unknown;
+}@Injectable({
+>>>>>>> 7b51f57 (Initial commit)
   providedIn: 'root'
 })
 export class YamlProcessorService {
 
+<<<<<<< HEAD
   constructor() { }
+=======
+  private highlightedKeys = new Set<string>(); // 用于跟踪需要高亮的键
+
+
+>>>>>>> 7b51f57 (Initial commit)
 
   parse(content: string): MihomoConfig {
     try {
       return jsyaml.load(content) as MihomoConfig;
+<<<<<<< HEAD
     } catch (e) {
       console.error('YAML Parse Error', e);
+=======
+    } catch (_) {
+      console.error('YAML Parse Error', _);
+>>>>>>> 7b51f57 (Initial commit)
       throw new Error('Invalid YAML format');
     }
   }
@@ -59,15 +150,24 @@ export class YamlProcessorService {
 
       return this.addComments(yamlStr);
 
+<<<<<<< HEAD
     } catch (e) {
       console.error('YAML Dump Error', e);
+=======
+    } catch (_) {
+      console.error('YAML Dump Error', _);
+>>>>>>> 7b51f57 (Initial commit)
       throw new Error('Failed to generate YAML');
     }
   }
 
   /**
    * Re-injects comments into the standard YAML output to maintain readability.
+<<<<<<< HEAD
    * JS-YAML strips comments, so we must add them back.
+=======
+   * JS-YAML strips comments, so we must add them back。
+>>>>>>> 7b51f57 (Initial commit)
    */
   private addComments(yamlStr: string): string {
     // A map of top-level keys to their comments
@@ -110,15 +210,24 @@ export class YamlProcessorService {
    * Merges user proxies into the template.
    * @param compatibilityMode If true, polyfills 'include-all' regex and downgrades 'smart' to 'url-test'
    */
+<<<<<<< HEAD
   mergeConfigs(templateYaml: string, userYaml: string, compatibilityMode: boolean = false): string {
     if (!templateYaml || !userYaml) return '';
 
+=======
+  mergeConfigs(templateYaml: string, userYaml: string, compatibilityMode = false): string {
+    if (!templateYaml || !userYaml) return '';
+
+    this.highlightedKeys.clear(); // 清除之前的记录
+
+>>>>>>> 7b51f57 (Initial commit)
     const template = this.parse(templateYaml);
     const user = this.parse(userYaml);
 
     // 1. Initialize result with template's top-level configs
     const result: MihomoConfig = { ...template };
 
+<<<<<<< HEAD
     // 2. Extract User Proxies
     // Some formats have proxies in 'proxies', others might be different, strictly following standard here.
     const userProxies = Array.isArray(user.proxies) ? user.proxies : [];
@@ -127,6 +236,24 @@ export class YamlProcessorService {
     // We keep template proxies (like 'Direct', 'Reject') and append user proxies
     const templateProxies = Array.isArray(template.proxies) ? template.proxies : [];
     result.proxies = [...templateProxies, ...userProxies];
+=======
+    // 记录用户配置中的顶级键
+    for (const key in user) {
+      if (Object.prototype.hasOwnProperty.call(user, key)) {
+        this.highlightedKeys.add(key);
+      }
+    }
+
+    // 2. Extract User Proxies
+    const userProxies = Array.isArray(user.proxies) ? user.proxies : [];
+    
+    // 3. Inject User Proxies into Template Proxies
+    const templateProxies = Array.isArray(template.proxies) ? template.proxies : [];
+    result.proxies = [...templateProxies, ...userProxies];
+    if (userProxies.length > 0) {
+      this.highlightedKeys.add('proxies');
+    }
+>>>>>>> 7b51f57 (Initial commit)
 
     // 4. Handle Proxy Groups (The complex part)
     if (result['proxy-groups'] && Array.isArray(result['proxy-groups'])) {
@@ -149,7 +276,12 @@ export class YamlProcessorService {
             try {
               const regex = new RegExp(group.filter);
               matches = allProxyNames.filter(name => regex.test(name));
+<<<<<<< HEAD
             } catch (e) {
+=======
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (_) {
+>>>>>>> 7b51f57 (Initial commit)
               console.warn(`Invalid Regex for group ${group.name}: ${group.filter}`);
             }
           } else {
@@ -193,10 +325,22 @@ export class YamlProcessorService {
     }
 
     // 5. Handle Proxy Providers
+<<<<<<< HEAD
     // If the user has providers, they override the template's placeholders.
     // If user has NO providers, we should probably remove the template's dummy providers to avoid errors.
     if (user['proxy-providers']) {
       result['proxy-providers'] = user['proxy-providers'];
+=======
+    if (user['proxy-providers']) {
+      result['proxy-providers'] = user['proxy-providers'];
+      this.highlightedKeys.add('proxy-providers');
+      // 记录用户配置中的代理提供者名称
+      for (const providerName in user['proxy-providers']) {
+        if (Object.prototype.hasOwnProperty.call(user['proxy-providers'], providerName)) {
+          this.highlightedKeys.add(providerName);
+        }
+      }
+>>>>>>> 7b51f57 (Initial commit)
     } else {
       // If template has dummy providers (indicated by placeholders), remove them if user didn't supply real ones
       // or just keep them if they look real? 
@@ -211,4 +355,11 @@ export class YamlProcessorService {
 
     return this.dump(result);
   }
+<<<<<<< HEAD
+=======
+
+  getHighlightedKeys(): Set<string> {
+    return this.highlightedKeys;
+  }
+>>>>>>> 7b51f57 (Initial commit)
 }

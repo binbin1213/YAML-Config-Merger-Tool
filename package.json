@@ -1,9 +1,14 @@
 {
+<<<<<<< HEAD
   "name": "mihomo-config-merger",
+=======
+  "name": "yaml-config-merger-tool",
+>>>>>>> 7b51f57 (Initial commit)
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+<<<<<<< HEAD
     "dev": "ng serve",
     "build": "ng build",
     "preview": "ng serve --configuration=production"
@@ -22,6 +27,42 @@
   "devDependencies": {
     "@types/node": "^22.14.0",
     "typescript": "~5.8.2",
+=======
+    "tailwind:watch": "tailwindcss -i ./src/styles.css -o ./src/tailwind-output.css --watch",
+    "dev": "concurrently \"npm run tailwind:watch\" \"ng serve --hmr\"",
+    "build": "tailwindcss -i ./src/styles.css -o ./src/styles.css --minify && ng build",
+    "build:prod": "tailwindcss -i ./src/styles.css -o ./src/styles.css --minify && ng build --configuration=production",
+    "preview": "ng serve --configuration=production",
+    "preview:prod": "ng serve --configuration=production --port 8080",
+    "lint": "ng lint",
+    "typecheck": "tsc --noEmit",
+    "tailwind:build": "tailwindcss -i ./src/styles.css -o ./dist/yaml-config-merger-tool/browser/styles.css --minify"
+  },
+  "dependencies": {
+    "@angular/build": "^21.0.0",
+    "@angular/cli": "^21.0.0",
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/compiler-cli": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.3",
+    "@angular/platform-browser": "^21.0.0",
+    "@types/prismjs": "^1.26.5",
+    "prism-themes": "^1.9.0",
+    "prismjs": "^1.30.0",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "angular-eslint": "21.1.0",
+    "autoprefixer": "^10.4.22",
+    "concurrently": "^8.2.2",
+    "eslint": "^9.39.1",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.18",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "8.47.0",
+>>>>>>> 7b51f57 (Initial commit)
     "vite": "^6.2.0"
   }
 }

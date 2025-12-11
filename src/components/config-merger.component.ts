@@ -1,13 +1,27 @@
+<<<<<<< HEAD
 
 import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { YamlProcessorService } from '../services/yaml-processor.service';
+=======
+import { Component, signal, inject, AfterViewInit, SecurityContext, ViewChild, ElementRef, effect } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
+import { YamlProcessorService } from '../services/yaml-processor.service';
+import { HighlightService } from '../services/highlight.service';
+
+import 'prismjs';
+import 'prismjs/components/prism-yaml';
+
+
+>>>>>>> 7b51f57 (Initial commit)
 
 @Component({
   selector: 'app-config-merger',
   standalone: true,
   imports: [CommonModule],
   template: `
+<<<<<<< HEAD
     <div class="flex flex-col h-full gap-6">
       
       <!-- Instructions / Top Bar -->
@@ -15,6 +29,21 @@ import { YamlProcessorService } from '../services/yaml-processor.service';
         <div>
           <h2 class="text-lg font-semibold text-slate-100">配置文件合并工具</h2>
           <p class="text-sm text-slate-400">第一步：确认模版 &rarr; 第二步：上传个人订阅 (YAML) &rarr; 第三步：下载结果</p>
+=======
+    <div class="flex flex-col w-full gap-4 h-full">
+      
+      <!-- Instructions / Top Bar -->
+      <div class="bg-slate-900 p-4 rounded-lg border border-slate-800 flex justify-between items-center shadow-sm flex-wrap gap-3">
+        <div>
+          <h2 class="text-lg font-semibold text-slate-100">配置文件合并工具</h2>
+          <div class="flex items-center gap-2 text-sm text-slate-400">
+            <span class="px-2 py-1 rounded-md" [class.bg-[var(--primary)]]="currentStep() === 1">1. 选择模版</span>
+            <span>→</span>
+            <span class="px-2 py-1 rounded-md" [class.bg-[var(--primary)]]="currentStep() === 2">2. 导入订阅</span>
+            <span>→</span>
+            <span class="px-2 py-1 rounded-md" [class.bg-[var(--primary)]]="currentStep() === 3">3. 下载结果</span>
+          </div>
+>>>>>>> 7b51f57 (Initial commit)
         </div>
         <div class="flex items-center gap-4">
              
@@ -22,7 +51,11 @@ import { YamlProcessorService } from '../services/yaml-processor.service';
              <div class="flex items-center gap-2 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700/50">
                 <div class="flex flex-col items-end">
                    <span class="text-xs font-medium text-slate-200">兼容模式</span>
+<<<<<<< HEAD
                    <span class="text-[10px] text-slate-500">{{ compatibilityMode() ? '转换 Smart/正则' : '保留原样' }}</span>
+=======
+                   <span class="text-[10px] text-red-500">{{ compatibilityMode() ? '兼容模式：转换 Smart/正则' : '需开启 Smart 内核' }}</span>
+>>>>>>> 7b51f57 (Initial commit)
                 </div>
                 <button 
                   role="switch" 
@@ -40,7 +73,11 @@ import { YamlProcessorService } from '../services/yaml-processor.service';
 
              <button 
               (click)="processMerge()"
+<<<<<<< HEAD
               class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-md transition-colors shadow-lg shadow-indigo-500/20 flex items-center gap-2">
+=======
+              class="px-4 py-2 bg-indigo-600 hover:bg-[var(--primary)] text-white text-sm font-medium rounded-md transition-colors shadow-lg shadow-indigo-500/20 flex items-center gap-2">
+>>>>>>> 7b51f57 (Initial commit)
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
@@ -49,7 +86,11 @@ import { YamlProcessorService } from '../services/yaml-processor.service';
             <button 
               (click)="downloadResult()"
               [disabled]="!mergedOutput()"
+<<<<<<< HEAD
               class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white text-sm font-medium rounded-md transition-colors shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+=======
+              class="px-4 py-2 bg-emerald-600 hover:bg-[var(--primary)] disabled:bg-slate-800/50 disabled:text-slate-500 disabled:border disabled:border-slate-700/50 disabled:shadow-none text-white text-sm font-medium rounded-md transition-colors shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+>>>>>>> 7b51f57 (Initial commit)
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
@@ -59,6 +100,7 @@ import { YamlProcessorService } from '../services/yaml-processor.service';
       </div>
 
       <!-- Main Editor Grid -->
+<<<<<<< HEAD
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
         
         <!-- Column 1: Template -->
@@ -113,6 +155,69 @@ import { YamlProcessorService } from '../services/yaml-processor.service';
               readonly
               class="absolute inset-0 w-full h-full p-4 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-emerald-100/90 focus:outline-none resize-none custom-scroll leading-relaxed whitespace-pre"
               [value]="mergedOutput()"></textarea>
+=======
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0 flex-1 h-full">
+        
+        <!-- Column 1: Template -->
+        <div class="flex flex-col gap-1 flex-1 min-h-0 bg-[rgb(30,30,35)] rounded-[10px] p-4">
+          <div class="card-header flex items-center mb-4">
+            <h3 class="text-white text-base font-bold flex items-center gap-2 border-b border-[var(--primary)] pb-2">
+              <!-- Icon Placeholder: Template -->
+              <span class="w-4 h-4 flex items-center justify-center text-slate-400">📄</span>
+              基础模版 (Template)
+            </h3>
+            <div class="flex gap-2">
+              <button class="text-xs text-blue-400 hover:text-[var(--primary)] transition-colors" (click)="copyTemplate()">复制</button>
+              <button class="text-xs text-blue-400 hover:text-[var(--primary)] transition-colors" (click)="clearTemplate()">清空</button>
+              <label class="cursor-pointer text-xs text-blue-400 hover:text-[var(--primary)] transition-colors">
+                <input type="file" class="hidden" (change)="onFileSelected($event, 'template')">
+                上传
+              </label>
+            </div>
+          </div>
+          <div class="relative flex-1 h-full">
+            <pre class="absolute inset-0 w-full h-full p-4 bg-slate-900 border border-slate-800 rounded-lg text-xs font-mono text-slate-300 focus:outline-none resize-none custom-scroll leading-relaxed whitespace-pre"><code #templateCode class="language-yaml"></code></pre>
+          </div>
+        </div>
+
+        <!-- Column 2: User Config -->
+        <div class="flex flex-col gap-1 flex-1 min-h-0 bg-[rgb(30,30,35)] rounded-[10px] p-4">
+          <div class="card-header flex items-center mb-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2 border-b border-[var(--primary)] pb-2">
+              <!-- Icon Placeholder: User Config -->
+              <span class="w-4 h-4 flex items-center justify-center text-slate-400">👤</span>
+              您的订阅配置 (User Config)
+            </h3>
+            <div class="flex gap-2">
+              <button class="text-xs text-purple-400 hover:text-[var(--primary)] transition-colors" (click)="copyUser()">复制</button>
+              <button class="text-xs text-purple-400 hover:text-[var(--primary)] transition-colors" (click)="clearUser()">清空</button>
+              <label class="cursor-pointer text-xs text-purple-400 hover:text-[var(--primary)] transition-colors">
+                <input type="file" class="hidden" (change)="onFileSelected($event, 'user')">
+                上传
+              </label>
+            </div>
+          </div>
+          <div class="relative flex-1 h-full">
+            <pre class="absolute inset-0 w-full h-full p-4 bg-slate-900 border border-slate-800 rounded-lg text-xs font-mono text-slate-300 focus:outline-none resize-none custom-scroll leading-relaxed whitespace-pre"><code #userCode class="language-yaml"></code></pre>
+          </div>
+        </div>
+
+        <!-- Column 3: Merged Result -->
+        <div class="flex flex-col gap-1 flex-1 min-h-0 bg-[rgb(30,30,35)] rounded-[10px] p-4">
+          <div class="card-header flex items-center mb-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2 border-b border-[var(--primary)] pb-2">
+              <!-- Icon Placeholder: Merged Result -->
+              <span class="w-4 h-4 flex items-center justify-center text-slate-400">✨</span>
+              合并结果 (Result)
+            </h3>
+            <div class="flex gap-2">
+              <button class="text-xs text-emerald-500/80 hover:text-[var(--primary)] transition-colors" (click)="copyMergedOutput()">复制</button>
+              @if (statusMessage()) {<span class="text-xs text-emerald-500/80">{{ statusMessage() }}</span>}
+            </div>
+          </div>
+          <div class="relative flex-1 h-full">
+            <pre class="absolute inset-0 w-full h-full p-4 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-emerald-100/90 focus:outline-none resize-none custom-scroll leading-relaxed whitespace-pre"><code #mergedCode class="language-yaml" [innerHTML]="mergedOutput()"></code></pre>
+>>>>>>> 7b51f57 (Initial commit)
           </div>
         </div>
 
@@ -120,6 +225,7 @@ import { YamlProcessorService } from '../services/yaml-processor.service';
     </div>
   `
 })
+<<<<<<< HEAD
 export class ConfigMergerComponent {
   private yamlService = inject(YamlProcessorService);
 
@@ -128,19 +234,126 @@ export class ConfigMergerComponent {
   mergedOutput = signal<string>('');
   statusMessage = signal<string>('');
   compatibilityMode = signal<boolean>(true); // Default to True to fix crashes
+=======
+export class ConfigMergerComponent implements AfterViewInit {
+  private yamlService = inject(YamlProcessorService);
+  private highlightService = inject(HighlightService);
+  private sanitizer = inject(DomSanitizer);
+
+  @ViewChild('mergedCode') mergedCode!: ElementRef<HTMLElement>;
+  @ViewChild('templateCode') templateCode!: ElementRef<HTMLElement>;
+  @ViewChild('userCode') userCode!: ElementRef<HTMLElement>;
+
+  ngAfterViewInit(): void {
+    this.highlightService.highlightAll();
+    this.highlightMergedCode();
+    this.highlightTemplateCode();
+    this.highlightUserCode();
+  }
+
+  templateContent = signal<string>('');
+  userContent = signal<string>('');
+  mergedOutput = signal<SafeHtml>(this.sanitizer.bypassSecurityTrustHtml(''));
+  statusMessage = signal<string>('');
+  compatibilityMode = signal<boolean>(false); // Default to True to fix crashes
+  currentStep = signal<number>(1);
+>>>>>>> 7b51f57 (Initial commit)
 
   constructor() {
     // Set the provided complex template as default
     this.templateContent.set(DEFAULT_TEMPLATE);
+<<<<<<< HEAD
+=======
+
+    // 监听合并结果变更并触发高亮
+    effect(() => {
+      this.mergedOutput();
+      setTimeout(() => this.highlightMergedCode(), 0);
+    });
+
+    effect(() => {
+      this.templateContent();
+      setTimeout(() => this.highlightTemplateCode(), 0);
+    });
+
+    effect(() => {
+      this.userContent();
+      setTimeout(() => this.highlightUserCode(), 0);
+    });
+  }
+
+  private highlightMergedCode() {
+    if (this.mergedCode?.nativeElement) {
+      this.highlightService.highlightElement(this.mergedCode.nativeElement);
+    }
+  }
+
+  private highlightTemplateCode() {
+    if (this.templateCode?.nativeElement) {
+      this.templateCode.nativeElement.textContent = this.templateContent();
+      this.highlightService.highlightElement(this.templateCode.nativeElement);
+    }
+  }
+
+  private highlightUserCode() {
+    if (this.userCode?.nativeElement) {
+      this.userCode.nativeElement.textContent = this.userContent();
+      this.highlightService.highlightElement(this.userCode.nativeElement);
+    }
+  }
+
+  copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      this.statusMessage.set('已复制到剪贴板！');
+      setTimeout(() => this.statusMessage.set(''), 2000);
+    }).catch(err => {
+      console.error('复制失败:', err);
+      this.statusMessage.set('复制失败！');
+    });
+  }
+
+  copyTemplate() {
+    this.copyToClipboard(this.templateContent());
+  }
+
+  clearTemplate() {
+    this.templateContent.set('');
+    this.processMerge();
+  }
+
+  copyUser() {
+    this.copyToClipboard(this.userContent());
+  }
+
+  clearUser() {
+    this.userContent.set('');
+    this.processMerge();
+  }
+
+  copyMergedOutput() {
+    // Extract plain text from SafeHtml
+    const div = document.createElement('div');
+    div.innerHTML = this.sanitizer.sanitize(SecurityContext.HTML, this.mergedOutput() as SafeHtml) || '';
+    const plainText = div.innerText;
+    this.copyToClipboard(plainText);
+>>>>>>> 7b51f57 (Initial commit)
   }
 
   updateTemplate(event: Event) {
     this.templateContent.set((event.target as HTMLTextAreaElement).value);
+<<<<<<< HEAD
+=======
+    this.currentStep.set(1);
+>>>>>>> 7b51f57 (Initial commit)
     this.processMerge();
   }
 
   updateUser(event: Event) {
     this.userContent.set((event.target as HTMLTextAreaElement).value);
+<<<<<<< HEAD
+=======
+    this.currentStep.set(2);
+>>>>>>> 7b51f57 (Initial commit)
     this.processMerge();
   }
 
@@ -152,6 +365,17 @@ export class ConfigMergerComponent {
   onFileSelected(event: Event, type: 'template' | 'user') {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
+<<<<<<< HEAD
+=======
+      const file = input.files[0];
+      // 校验文件类型
+      const fileName = file.name.toLowerCase();
+      if (!fileName.endsWith('.yaml') && !fileName.endsWith('.yml')) {
+        this.statusMessage.set('错误：仅支持 YAML (.yaml/.yml) 文件 ❌');
+        return;
+      }
+      
+>>>>>>> 7b51f57 (Initial commit)
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = e.target?.result as string;
@@ -179,23 +403,57 @@ export class ConfigMergerComponent {
         this.userContent(),
         this.compatibilityMode()
       );
+<<<<<<< HEAD
       this.mergedOutput.set(result);
       const modeText = this.compatibilityMode() ? '兼容模式' : '原版模式';
       this.statusMessage.set(`合并成功 (${modeText}) ✅`);
     } catch (err) {
       console.error(err);
+=======
+      const highlightedKeys = this.yamlService.getHighlightedKeys();
+      let highlightedResult = this.highlightService.highlight(result, 'yaml');
+      console.log('Highlighted Result:', highlightedResult);
+
+      // Apply custom highlighting for user-derived keys
+      highlightedKeys.forEach(key => {
+        // This regex targets the key itself, ensuring it's not part of a larger word
+        // and handles potential YAML structure (e.g., key: value, - key: value)
+        const regex = new RegExp(`(\\\\b${key}\\\\b)(?=\\\\s*:)`, 'g');
+        highlightedResult = highlightedResult.replace(regex, `<span style="background-color: rgba(185, 174, 245, 0.15);">$1</span>`);
+      });
+
+      this.mergedOutput.set(this.sanitizer.bypassSecurityTrustHtml(highlightedResult));
+      const modeText = this.compatibilityMode() ? '兼容模式' : '原版模式';
+      this.statusMessage.set(`合并成功 (${modeText}) ✅`);
+      this.currentStep.set(3);
+    } catch (err) {
+      console.error('合并失败:', err);
+>>>>>>> 7b51f57 (Initial commit)
       this.statusMessage.set('错误：无效的 YAML 格式 ❌');
     }
   }
 
   downloadResult() {
     if (!this.mergedOutput()) return;
+<<<<<<< HEAD
     const blob = new Blob([this.mergedOutput()], { type: 'text/yaml' });
+=======
+    // Extract plain text from SafeHtml
+    const div = document.createElement('div');
+    div.innerHTML = this.sanitizer.sanitize(SecurityContext.HTML, this.mergedOutput() as SafeHtml) || '';
+    const plainText = div.innerText;
+
+    const blob = new Blob([plainText], { type: 'text/yaml' });
+>>>>>>> 7b51f57 (Initial commit)
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = 'config.yaml';
     a.click();
+<<<<<<< HEAD
+=======
+    // 释放 URL 资源
+>>>>>>> 7b51f57 (Initial commit)
     window.URL.revokeObjectURL(url);
   }
 }
@@ -214,7 +472,11 @@ proxy-providers:
     interval: 86400
     health-check:
       enable: true
+<<<<<<< HEAD
       url: https://sfojdgs18.syzagk.com:8888/api/v1/client/subscribe?token=c9b43bd076e168646b156834f7505997
+=======
+      url: "YOUR_SUBSCRIPTION_ADDRESS_HERE"
+>>>>>>> 7b51f57 (Initial commit)
       interval: 300
     proxy: 直连 
 proxies:
