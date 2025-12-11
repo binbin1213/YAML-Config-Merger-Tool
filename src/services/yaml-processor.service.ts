@@ -2,19 +2,6 @@
 import { Injectable } from '@angular/core';
 
 // Declare global jsyaml from the CDN script
-<<<<<<< HEAD
-declare const jsyaml: any;
-
-export interface MihomoConfig {
-  proxies?: any[];
-  'proxy-groups'?: any[];
-  'proxy-providers'?: any;
-  rules?: string[];
-  [key: string]: any;
-}
-
-@Injectable({
-=======
 interface JsYamlOptions {
   lineWidth?: number;
   noRefs?: boolean;
@@ -91,30 +78,20 @@ export interface MihomoConfig {
   experiments?: unknown;
   'sub-rules'?: unknown;
   'rule-providers'?: unknown;
-}@Injectable({
->>>>>>> 7b51f57 (Initial commit)
+}
+
+@Injectable({
   providedIn: 'root'
 })
 export class YamlProcessorService {
 
-<<<<<<< HEAD
-  constructor() { }
-=======
   private highlightedKeys = new Set<string>(); // 用于跟踪需要高亮的键
-
-
->>>>>>> 7b51f57 (Initial commit)
 
   parse(content: string): MihomoConfig {
     try {
       return jsyaml.load(content) as MihomoConfig;
-<<<<<<< HEAD
-    } catch (e) {
-      console.error('YAML Parse Error', e);
-=======
     } catch (_) {
       console.error('YAML Parse Error', _);
->>>>>>> 7b51f57 (Initial commit)
       throw new Error('Invalid YAML format');
     }
   }
@@ -150,25 +127,16 @@ export class YamlProcessorService {
 
       return this.addComments(yamlStr);
 
-<<<<<<< HEAD
-    } catch (e) {
-      console.error('YAML Dump Error', e);
-=======
     } catch (_) {
       console.error('YAML Dump Error', _);
->>>>>>> 7b51f57 (Initial commit)
       throw new Error('Failed to generate YAML');
     }
   }
 
   /**
-   * Re-injects comments into the standard YAML output to maintain readability.
-<<<<<<< HEAD
-   * JS-YAML strips comments, so we must add them back.
-=======
-   * JS-YAML strips comments, so we must add them back。
->>>>>>> 7b51f57 (Initial commit)
-   */
+ * Re-injects comments into the standard YAML output to maintain readability.
+ * JS-YAML strips comments, so we must add them back.
+ */
   private addComments(yamlStr: string): string {
     // A map of top-level keys to their comments
     const comments: Record<string, string> = {
@@ -210,17 +178,10 @@ export class YamlProcessorService {
    * Merges user proxies into the template.
    * @param compatibilityMode If true, polyfills 'include-all' regex and downgrades 'smart' to 'url-test'
    */
-<<<<<<< HEAD
-  mergeConfigs(templateYaml: string, userYaml: string, compatibilityMode: boolean = false): string {
-    if (!templateYaml || !userYaml) return '';
-
-=======
   mergeConfigs(templateYaml: string, userYaml: string, compatibilityMode = false): string {
     if (!templateYaml || !userYaml) return '';
 
     this.highlightedKeys.clear(); // 清除之前的记录
-
->>>>>>> 7b51f57 (Initial commit)
     const template = this.parse(templateYaml);
     const user = this.parse(userYaml);
 

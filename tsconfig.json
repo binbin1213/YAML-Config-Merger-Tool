@@ -16,12 +16,7 @@
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "moduleDetection": "force",
-    "allowJs": true,
-<<<<<<< HEAD
     "jsx": "react-jsx",
-=======
-
->>>>>>> 7b51f57 (Initial commit)
     "paths": {
       "@/*": [
         "./*"
