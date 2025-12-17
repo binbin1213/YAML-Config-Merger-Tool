@@ -18,8 +18,10 @@
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "assets": [
+              "src/favicon.ico",
+              "src/assets",
               {
-                "glob": "**/*",
+                "glob": "_redirects",
                 "input": "public"
               }
             ],
@@ -81,8 +83,10 @@
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "assets": [
+              "src/favicon.ico",
+              "src/assets",
               {
-                "glob": "**/*",
+                "glob": "_redirects",
                 "input": "public"
               }
             ],
