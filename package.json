@@ -15,8 +15,7 @@
     "build:cloudflare": "ng build --configuration production",
     "preview": "ng serve --configuration production --port 8080",
     "lint": "ng lint",
-    "typecheck": "tsc --noEmit",
-    "postinstall": "ngcc"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@angular/animations": "~17.0.0",
