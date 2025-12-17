@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "name": "yaml-config-merger-tool",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/yaml-config-merger-tool/browser"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/yaml-config-merger-tool/browser",
+  "installCommand": "npm install",
+  "framework": "angular"
+}

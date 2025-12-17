@@ -1,0 +1,50 @@
+<main class="w-full h-screen flex flex-col overflow-hidden bg-slate-950">
+  <header class="h-16 border-b border-slate-800 bg-slate-900/50 backdrop-blur flex items-center px-6 justify-between flex-shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20">
+        M
+      </div>
+      <h1 class="font-bold text-xl tracking-tight text-slate-100">
+        Mihomo <span class="text-slate-500 font-normal">工具箱</span>
+      </h1>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">使用说明</a>
+      <div class="h-4 w-px bg-slate-800"></div>
+      <span class="text-xs px-2 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700">v1.0.0</span>
+    </div>
+  </header>
+  
+  <div class="flex-1 overflow-hidden p-6">
+    <app-config-merger></app-config-merger>
+  </div>
+</main>
+<div class="flex flex-col h-screen">
+  <main class="w-full flex flex-col bg-slate-950 flex-1 min-h-0 h-full">
+    <header class="h-16 border-b border-[rgba(100,100,100,0.2)] bg-[rgba(20,20,25,0.7)] backdrop-blur-[10px] flex items-center px-6 justify-between flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 flex items-center justify-center">
+          <img src="./favicon.svg" alt="YAML Config Merger Tool" class="w-8 h-8">
+        </div>
+        <h1 class="font-bold text-xl tracking-tight text-slate-100">
+          YAML Config Merger
+        </h1>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">使用说明</a>
+        <div class="h-4 w-px bg-slate-800"></div>
+        <span class="text-xs px-2 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700">v1.0.0</span>
+      </div>
+    </header>
+    
+    <div class="flex-1 p-4 h-full">
+      <app-config-merger></app-config-merger>
+    </div>
+  </main>
+  <footer class="h-12 border-t border-slate-800 bg-slate-950 backdrop-blur flex items-center px-6 justify-center flex-shrink-0">
+    <div class="flex items-center gap-4">
+      <span class="text-xs text-slate-400">YAML Config Merger Tool &copy; 2025</span>
+      <a href="https://github.com/binbin1213/Mihomo" target="_blank" class="text-xs text-slate-400 hover:text-white transition-colors underline">GitHub</a>
+    </div>
+  </footer>
+</div>
