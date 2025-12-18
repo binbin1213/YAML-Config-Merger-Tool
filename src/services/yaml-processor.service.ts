@@ -87,6 +87,31 @@ export class YamlProcessorService {
 
   private highlightedKeys = new Set<string>(); // 用于跟踪需要高亮的键
 
+  private getDirectTarget(config: MihomoConfig): string {
+    const proxyNames = (config.proxies ?? []).map(p => p.name);
+    const groupNames = (config['proxy-groups'] ?? []).map(g => g.name);
+    if (proxyNames.includes('直连') || groupNames.includes('直连')) return '直连';
+    return 'DIRECT';
+  }
+
+  private ensureLanBypassRules(config: MihomoConfig): void {
+    const directTarget = this.getDirectTarget(config);
+    const cidrs = ['127.0.0.0/8', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.0.0/16'];
+
+    const desiredRules = cidrs.map(cidr => `IP-CIDR,${cidr},${directTarget},no-resolve`);
+    const existingRules = Array.isArray(config.rules) ? config.rules : [];
+
+    const filteredRules = existingRules.filter(rule => {
+      if (typeof rule !== 'string') return false;
+      if (!rule.startsWith('IP-CIDR,')) return true;
+      const parts = rule.split(',');
+      const cidr = parts[1];
+      return !cidrs.includes(cidr);
+    });
+
+    config.rules = [...desiredRules, ...filteredRules];
+  }
+
   parse(content: string): MihomoConfig {
     try {
       return jsyaml.load(content) as MihomoConfig;
@@ -298,6 +323,8 @@ export class YamlProcessorService {
         }
       }
     }
+
+    this.ensureLanBypassRules(result);
 
     return this.dump(result);
   }
