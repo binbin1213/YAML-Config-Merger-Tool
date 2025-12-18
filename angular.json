@@ -14,7 +14,7 @@
           "options": {
             "outputPath": {
               "base": "./dist",
-              "browser": "."
+              "browser": "browser"
             },
             "browser": "index.tsx",
             "tsConfig": "tsconfig.json",
