@@ -81,13 +81,12 @@ export class ConfigMergerComponent implements AfterViewInit {
     this.error.set('');
 
     try {
-      const template = this.yamlProcessor.parseYaml(this.templateConfig());
-      const custom = this.yamlProcessor.parseYaml(this.customConfig());
+      const mergedYaml = this.yamlProcessor.mergeConfigs(
+        this.templateConfig(),
+        this.customConfig()
+      );
 
-      const merged = this.yamlProcessor.mergeConfigs(template, custom);
-      const yamlOutput = this.yamlProcessor.stringifyYaml(merged);
-
-      this.mergedConfig.set(yamlOutput);
+      this.mergedConfig.set(mergedYaml);
       this.showPreview.set(true);
 
       // 延迟高亮以确保 DOM 已更新

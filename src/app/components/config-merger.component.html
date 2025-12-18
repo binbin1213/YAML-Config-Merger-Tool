@@ -1,0 +1,82 @@
+<div class="h-full flex flex-col gap-4">
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="flex flex-col gap-2">
+      <h2 class="text-sm font-semibold text-slate-100">模板配置</h2>
+      <textarea
+        #templateArea
+        class="w-full h-64 bg-slate-950 border border-slate-800 rounded px-3 py-2 text-xs font-mono text-slate-100 resize-none outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+        [value]="templateConfig()"
+        (input)="onTemplateChange(templateArea.value)"
+      ></textarea>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-slate-100">自定义订阅配置</h2>
+        <label class="inline-flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+          <span class="px-2 py-1 rounded bg-slate-900 border border-slate-700">导入文件</span>
+          <input
+            type="file"
+            class="hidden"
+            (change)="onFileUpload($event)"
+            accept=".yaml,.yml,.txt"
+          />
+        </label>
+      </div>
+      <textarea
+        #customArea
+        class="w-full h-64 bg-slate-950 border border-slate-800 rounded px-3 py-2 text-xs font-mono text-slate-100 resize-none outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+        [value]="customConfig()"
+        (input)="onCustomConfigChange(customArea.value)"
+      ></textarea>
+    </div>
+  </section>
+
+  <section class="flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <button
+        class="px-4 py-2 rounded bg-indigo-500 text-xs font-medium text-white hover:bg-indigo-400 disabled:bg-slate-700 disabled:text-slate-400 transition-colors"
+        (click)="mergeConfigs()"
+        [disabled]="isProcessing()"
+      >
+        {{ isProcessing() ? '正在合并...' : '合并配置' }}
+      </button>
+      <button
+        class="px-3 py-2 rounded border border-slate-700 text-xs text-slate-200 hover:bg-slate-800 transition-colors"
+        (click)="downloadResult()"
+        [disabled]="!mergedConfig()"
+      >
+        下载 YAML
+      </button>
+    </div>
+
+    <div class="text-xs text-slate-400" *ngIf="mergedConfig()">
+      已生成合并后的配置，可直接导入 Clash/Mihomo 客户端
+    </div>
+  </section>
+
+  <section class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="flex flex-col min-h-0">
+      <h2 class="text-sm font-semibold text-slate-100 mb-2">合并结果（YAML）</h2>
+      <textarea
+        class="w-full h-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-xs font-mono text-slate-100 resize-none outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+        [value]="mergedConfig()"
+        readonly
+      ></textarea>
+    </div>
+
+    <div class="flex flex-col min-h-0">
+      <h2 class="text-sm font-semibold text-slate-100 mb-2">高亮预览</h2>
+      <div
+        #outputPreview
+        class="w-full h-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-xs font-mono text-slate-100 overflow-auto"
+        [innerHTML]="highlightedOutput()"
+      ></div>
+    </div>
+  </section>
+
+  <section *ngIf="error()" class="mt-2 text-xs text-red-400">
+    {{ error() }}
+  </section>
+</div>
+

@@ -188,27 +188,16 @@ export class YamlProcessorService {
     // 1. Initialize result with template's top-level configs
     const result: MihomoConfig = { ...template };
 
-    // 2. Extract User Proxies
-    // Some formats have proxies in 'proxies', others might be different, strictly following standard here.
     const userProxies = Array.isArray(user.proxies) ? user.proxies : [];
-    
-    // 3. Inject User Proxies into Template Proxies
-    // We keep template proxies (like 'Direct', 'Reject') and append user proxies
     const templateProxies = Array.isArray(template.proxies) ? template.proxies : [];
     result.proxies = [...templateProxies, ...userProxies];
-    // 记录用户配置中的顶级键
+
     for (const key in user) {
       if (Object.prototype.hasOwnProperty.call(user, key)) {
         this.highlightedKeys.add(key);
       }
     }
 
-    // 2. Extract User Proxies
-    const userProxies = Array.isArray(user.proxies) ? user.proxies : [];
-    
-    // 3. Inject User Proxies into Template Proxies
-    const templateProxies = Array.isArray(template.proxies) ? template.proxies : [];
-    result.proxies = [...templateProxies, ...userProxies];
     if (userProxies.length > 0) {
       this.highlightedKeys.add('proxies');
     }
@@ -216,8 +205,7 @@ export class YamlProcessorService {
     // 4. Handle Proxy Groups (The complex part)
     if (result['proxy-groups'] && Array.isArray(result['proxy-groups'])) {
       
-      // Get a list of all available proxy names for filtering
-      const allProxyNames = result.proxies.map(p => p.name);
+      const allProxyNames = (result.proxies ?? []).map(p => p.name);
 
       result['proxy-groups'] = result['proxy-groups'].map(group => {
         
@@ -234,8 +222,6 @@ export class YamlProcessorService {
             try {
               const regex = new RegExp(group.filter);
               matches = allProxyNames.filter(name => regex.test(name));
-            } catch (e) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (_) {
               console.warn(`Invalid Regex for group ${group.name}: ${group.filter}`);
             }
@@ -244,16 +230,14 @@ export class YamlProcessorService {
             matches = [...allProxyNames];
           }
 
-          // Ensure proxies array exists
-          if (!group.proxies) group.proxies = [];
-          
-          // Add matches to the group's proxies list, avoiding duplicates
-          const existing = new Set(group.proxies);
+          const proxies = group.proxies ?? [];
+          const existing = new Set(proxies);
           matches.forEach(m => {
             if (!existing.has(m)) {
-              group.proxies.push(m);
+              proxies.push(m);
             }
           });
+          group.proxies = proxies;
 
           // REMOVE the dynamic keys so the core doesn't get confused or error out
           delete group['include-all'];
@@ -279,15 +263,9 @@ export class YamlProcessorService {
       });
     }
 
-    // 5. Handle Proxy Providers
-    // If the user has providers, they override the template's placeholders.
-    // If user has NO providers, we should probably remove the template's dummy providers to avoid errors.
-    if (user['proxy-providers']) {
-      result['proxy-providers'] = user['proxy-providers'];
     if (user['proxy-providers']) {
       result['proxy-providers'] = user['proxy-providers'];
       this.highlightedKeys.add('proxy-providers');
-      // 记录用户配置中的代理提供者名称
       for (const providerName in user['proxy-providers']) {
         if (Object.prototype.hasOwnProperty.call(user['proxy-providers'], providerName)) {
           this.highlightedKeys.add(providerName);
