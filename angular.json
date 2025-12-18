@@ -17,13 +17,6 @@
               "browser": "."
             },
             "browser": "index.tsx",
-<<<<<<< HEAD
-            "tsConfig": "tsconfig.json"
-          },
-          "configurations": {
-            "production": {
-              "outputHashing": "all"
-=======
             "tsConfig": "tsconfig.json",
             "styles": [
               "src/tailwind-output.css",
@@ -54,17 +47,12 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true
->>>>>>> 7b51f57 (Initial commit)
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-<<<<<<< HEAD
-              "sourceMap": true
-=======
               "sourceMap": true,
               "outputHashing": "none"
->>>>>>> 7b51f57 (Initial commit)
             }
           },
           "defaultConfiguration": "production"
@@ -72,12 +60,8 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-<<<<<<< HEAD
-            "port": 3000
-=======
             "port": 3001,
             "buildTarget": "app:build:development"
->>>>>>> 7b51f57 (Initial commit)
           },
           "configurations": {
             "production": {
@@ -88,13 +72,6 @@
             }
           },
           "defaultConfiguration": "development"
-<<<<<<< HEAD
-        }
-      }
-    }
-  }
-}
-=======
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
@@ -115,4 +92,3 @@
     ]
   }
 }
->>>>>>> 7b51f57 (Initial commit)

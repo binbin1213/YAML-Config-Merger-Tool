@@ -188,16 +188,6 @@ export class YamlProcessorService {
     // 1. Initialize result with template's top-level configs
     const result: MihomoConfig = { ...template };
 
-<<<<<<< HEAD
-    // 2. Extract User Proxies
-    // Some formats have proxies in 'proxies', others might be different, strictly following standard here.
-    const userProxies = Array.isArray(user.proxies) ? user.proxies : [];
-    
-    // 3. Inject User Proxies into Template Proxies
-    // We keep template proxies (like 'Direct', 'Reject') and append user proxies
-    const templateProxies = Array.isArray(template.proxies) ? template.proxies : [];
-    result.proxies = [...templateProxies, ...userProxies];
-=======
     // 记录用户配置中的顶级键
     for (const key in user) {
       if (Object.prototype.hasOwnProperty.call(user, key)) {
@@ -214,7 +204,6 @@ export class YamlProcessorService {
     if (userProxies.length > 0) {
       this.highlightedKeys.add('proxies');
     }
->>>>>>> 7b51f57 (Initial commit)
 
     // 4. Handle Proxy Groups (The complex part)
     if (result['proxy-groups'] && Array.isArray(result['proxy-groups'])) {
@@ -237,12 +226,8 @@ export class YamlProcessorService {
             try {
               const regex = new RegExp(group.filter);
               matches = allProxyNames.filter(name => regex.test(name));
-<<<<<<< HEAD
-            } catch (e) {
-=======
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (_) {
->>>>>>> 7b51f57 (Initial commit)
               console.warn(`Invalid Regex for group ${group.name}: ${group.filter}`);
             }
           } else {
@@ -286,12 +271,6 @@ export class YamlProcessorService {
     }
 
     // 5. Handle Proxy Providers
-<<<<<<< HEAD
-    // If the user has providers, they override the template's placeholders.
-    // If user has NO providers, we should probably remove the template's dummy providers to avoid errors.
-    if (user['proxy-providers']) {
-      result['proxy-providers'] = user['proxy-providers'];
-=======
     if (user['proxy-providers']) {
       result['proxy-providers'] = user['proxy-providers'];
       this.highlightedKeys.add('proxy-providers');
@@ -301,26 +280,29 @@ export class YamlProcessorService {
           this.highlightedKeys.add(providerName);
         }
       }
->>>>>>> 7b51f57 (Initial commit)
     } else {
       // If template has dummy providers (indicated by placeholders), remove them if user didn't supply real ones
       // or just keep them if they look real? 
-      // Safe bet: If the template has specific "placeholder" providers like "山水云", remove them.
       if (result['proxy-providers']) {
-         // Check if it contains known placeholder keys
-         if (result['proxy-providers']['山水云']) {
-            delete result['proxy-providers']; 
-         }
+        const providers = result['proxy-providers'];
+        const hasPlaceholderUrl = Object.values(providers).some(provider => {
+          return (
+            provider.url.includes('YOUR_SUBSCRIPTION_ADDRESS_HERE') ||
+            provider.url.includes('机场订阅地址') ||
+            provider.url.startsWith('YOUR_')
+          );
+        });
+
+        if (hasPlaceholderUrl) {
+          delete result['proxy-providers'];
+        }
       }
     }
 
     return this.dump(result);
   }
-<<<<<<< HEAD
-=======
 
   getHighlightedKeys(): Set<string> {
     return this.highlightedKeys;
   }
->>>>>>> 7b51f57 (Initial commit)
 }

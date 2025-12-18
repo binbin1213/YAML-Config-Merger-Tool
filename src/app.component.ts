@@ -1,5 +1,5 @@
 
-import { Component } from '@angular/core';
+import { Component, HostListener, signal } from '@angular/core';
 import { ConfigMergerComponent } from './components/config-merger.component';
 
 @Component({
@@ -8,4 +8,23 @@ import { ConfigMergerComponent } from './components/config-merger.component';
   imports: [ConfigMergerComponent],
   templateUrl: './app.component.html',
 })
-export class AppComponent {}
+export class AppComponent {
+  protected readonly helpOpen = signal(false);
+
+  protected openHelp(): void {
+    this.helpOpen.set(true);
+  }
+
+  protected closeHelp(): void {
+    this.helpOpen.set(false);
+  }
+
+  protected toggleHelp(): void {
+    this.helpOpen.update(v => !v);
+  }
+
+  @HostListener('document:keydown.escape')
+  protected onEscape(): void {
+    if (this.helpOpen()) this.closeHelp();
+  }
+}

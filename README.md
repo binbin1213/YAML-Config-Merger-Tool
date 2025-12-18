@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-# Mihomo Config Merger (Mihomo 工具箱)
-
-**Mihomo Config Merger** 是一个基于 Web 的纯前端工具，旨在帮助用户将个人的 Clash/Mihomo 机场订阅（节点信息）自动合并到预设的高级分流规则模版中。
-=======
 # YAML Config Merger Tool (YAML 配置合并工具)
 
 **YAML Config Merger Tool** 是一个基于 Web 的纯前端工具，旨在帮助用户将个人的 Clash/Mihomo 机场订阅（节点信息）自动合并到预设的高级分流规则模版中。
->>>>>>> 7b51f57 (Initial commit)
 
 它解决了“拥有好的规则模版，但每次更新订阅都需要手动复制粘贴节点”的痛点，并提供了独有的“兼容模式”，让不支持正则筛选的老旧内核也能使用高级分组逻辑。
 
@@ -20,11 +14,8 @@
 - **注释保留**：智能重注机制，确保生成的 YAML 文件保留关键模块的中文注释，便于阅读。
 - **现代化 UI**：使用 Tailwind CSS 构建的暗色系界面，简洁美观。
 
-<<<<<<< HEAD
-=======
 ![YAML Config Merger Tool 界面预览](assets/Mihomo.png)
 
->>>>>>> 7b51f57 (Initial commit)
 ------
 
 
@@ -38,9 +29,6 @@
 - **框架**: Angular (Standalone, Signals)
 - **样式**: Tailwind CSS (通过 CDN 引入)
 - **核心库**: js-yaml (用于 YAML <-> JSON 转换)
-<<<<<<< HEAD
-- **构建工具**: 无需复杂构建，基于浏览器原生 ES Modules (通过 index.tsx 引导)。
-=======
 - **构建工具**: 基于 Angular CLI 进行构建和开发，通过 `index.tsx` 引导应用。
 
 ### 构建与部署
@@ -51,7 +39,6 @@
 - **生产构建**: 可通过 Angular CLI 进行优化构建，生成静态文件
 - **静态部署**: 构建后的文件可部署到任何静态文件服务器
 - **容器化部署**: 支持 Docker 容器化部署
->>>>>>> 7b51f57 (Initial commit)
 
 ### 核心逻辑流程
 
@@ -83,11 +70,6 @@ codeText
 .
 ├── index.html                  # 入口 HTML (引入 Tailwind, js-yaml, importmap)
 ├── index.tsx                   # Angular 启动文件 (Bootstrap)
-<<<<<<< HEAD
-├── metadata.json               # 项目元数据配置
-├── shanshui.yaml               # (示例) 用户上传的订阅文件样例
-├── clash-all-fallback-smart.yaml # (核心) 内置的高级分流模版
-=======
 
 ├── shanshui.yaml               # (示例) 用户上传的订阅文件样例
 ├── clash-all-fallback-smart.yaml # (核心) 内置的高级分流模版
@@ -96,7 +78,6 @@ codeText
 ├── public/                     # 存放公共资源文件
 │   ├── favicon.ico             # 网站 favicon 图标
 │   └── favicon.svg             # 网站 favicon 图标 (SVG格式)
->>>>>>> 7b51f57 (Initial commit)
 └── src
     ├── app.component.html      # 主布局 HTML
     ├── app.component.ts        # 根组件逻辑
@@ -106,8 +87,6 @@ codeText
         └── yaml-processor.service.ts  # 核心业务逻辑 (解析、合并、正则Polyfill、降级处理)
 ```
 
-<<<<<<< HEAD
-=======
 ### 目录结构说明
 
 - **根目录**：包含主要的项目文件和配置文件
@@ -117,7 +96,6 @@ codeText
   - **components/**：存放 Angular 组件
   - **services/**：存放业务逻辑服务
 
->>>>>>> 7b51f57 (Initial commit)
 ------
 
 
@@ -158,13 +136,8 @@ codeText
    - 找到您的机场订阅链接，在浏览器下载为 .yaml 文件，或直接复制文件内容。
    - 点击“导入文件”或直接粘贴到中间的文本框。
 4. **选择模式 (右上角)**：
-<<<<<<< HEAD
    - **兼容模式 (开启 - 推荐)**：生成的配置文件是“静态”的。Web 工具已经帮您把正则筛选算好了。**适用于所有内核** (Clash Premium, Clash Verge, ClashX, Mihomo)。
    - **原版模式 (关闭)**：生成的配置文件保留 include-all 和正则语法。**仅适用于最新的 Mihomo (Clash Meta) 内核**。
-=======
-   - **兼容模式 (关闭)**：生成的配置文件保留 include-all 和正则语法。**仅适用于最新的 Mihomo (Clash Meta) 内核**。
-   - **原版模式 (开启 - 推荐)**：生成的配置文件是“静态”的。Web 工具已经帮您把正则筛选算好了。**适用于所有内核** (Clash Premium, Clash Verge, ClashX, Mihomo)。
->>>>>>> 7b51f57 (Initial commit)
 5. **生成与下载**：
    - 点击“刷新合并”查看预览。
    - 点击“下载 YAML”保存文件，然后导入您的 Clash 客户端即可。
@@ -175,42 +148,6 @@ codeText
 
 ## 6. 部署指南
 
-<<<<<<< HEAD
-由于这是一个纯静态的 Web 应用（无后端数据库），部署非常简单。
-
-### 方法 A: 使用 Vercel / Netlify (推荐)
-
-1. 将代码推送到 GitHub 仓库。
-2. 在 Vercel 中导入该仓库。
-3. Build Command 留空（或根据您具体的构建环境，本项目当前是基于浏览器运行时编译的，如果是标准 Angular CLI 项目则需 ng build）。
-   - *注意*：当前提供的代码是基于 AI Studio/StackBlitz 的即时运行环境。如果要部署到生产环境，建议使用 Angular CLI 初始化一个标准项目并将代码迁移进去。
-
-### 方法 B: 使用 Docker (Nginx)
-
-如果是标准构建后的静态文件 (dist/ 目录)：
-
-codeDockerfile
-
-
-
-```
-FROM nginx:alpine
-COPY ./dist/mihomo-merger /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-### 方法 C: 本地运行 (开发环境)
-
-如果您想在本地运行此代码，最简单的方法是使用支持 Angular 的在线 IDE（如 StackBlitz）或者本地搭建 Angular 环境：
-
-1. 安装 Node.js 和 Angular CLI: npm install -g @angular/cli
-2. 创建新项目: ng new mihomo-merger --style=css --routing=false --standalone
-3. 安装 Tailwind CSS (参考 Tailwind 官方 Angular 指南)。
-4. 安装 js-yaml 类型库: npm install js-yaml @types/js-yaml
-5. 将上述提供的 src/ 文件内容复制到本地对应的文件中。
-6. 运行: ng serve
-=======
 由于这是一个纯静态的 Web 应用（无后端数据库），部署非常简单。以下是几种常见的部署方法：
 
 ### 方法 A: 使用 Vercel / Netlify (推荐)
@@ -301,7 +238,6 @@ CMD ["nginx", "-g", "daemon off;"]
 3. **Angular 开发模式警告**：这是正常的开发环境行为，表示应用正在开发模式下运行，具有额外的调试和验证功能。
 
 这些警告在生产构建中会自动消失。
->>>>>>> 7b51f57 (Initial commit)
 
 ------
 
@@ -310,11 +246,7 @@ CMD ["nginx", "-g", "daemon off;"]
 ## 7. 常见问题 (FAQ)
 
 **Q: 为什么生成的配置文件里没有 include-all 了？**
-<<<<<<< HEAD
-A: 如果您开启了“兼容模式”，工具会把 include-all 的计算过程在浏览器里执行完毕，直接把结果（节点名称列表）写入了配置文件。这大大提高了配置文件的兼容性，防止旧版软件报错。
-=======
 A: 如果您开启了“原版模式”，工具会把 include-all 的计算过程在浏览器里执行完毕，直接把结果（节点名称列表）写入了配置文件。这大大提高了配置文件的兼容性，防止旧版软件报错。如果您希望保留 include-all 语法，请使用“兼容模式”。
->>>>>>> 7b51f57 (Initial commit)
 
 **Q: 我的机场只有 SSR 节点，支持吗？**
 A: 支持。只要您的 Clash 核心支持该协议，本工具只是负责搬运和合并节点信息，不会修改节点本身的连接参数。
