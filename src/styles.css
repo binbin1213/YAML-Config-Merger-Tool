@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #7b68ee;
+}
+
+::selection {
+  background: rgba(185, 174, 245, 0.3);
+}
+
+body {
+  margin: 0;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at center, #121212 0%, #0a0a0a 100%);
+  font-family: JetBrains Mono, Fira Code, Cascadia Code, monospace;
+  font-feature-settings: "liga" on;
+  font-size: 14px;
+  height: 100%;
+}
+
+html,
+:host {
+  height: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 150, 150, 0.5);
+}
+
+.card-header h3 {
+  position: relative;
+  padding-left: 15px;
+}
+
+.card-header h3::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 80%;
+  border-radius: 2px;
+  background-color: var(--primary);
+}

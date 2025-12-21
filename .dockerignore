@@ -1,0 +1,34 @@
+# 排除不必要的文件，减小镜像体积
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 构建产物
+dist/
+.git/
+.gitignore
+README.md
+angular.json
+tsconfig.json
+package.json
+package-lock.json
+
+# 测试文件
+test-*.yaml
+demo-*.yaml
+real-*.yaml
+
+# 临时文件
+*.tmp
+.temp/
+cache/
+
+# IDE文件
+.vscode/
+.idea/
+
+# 系统文件
+.DS_Store
+Thumbs.db

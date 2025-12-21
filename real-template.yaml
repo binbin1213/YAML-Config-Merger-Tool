@@ -1,0 +1,66 @@
+# Clash/Mihomo 配置模板 - 用于日常上网
+mixed-port: 7890
+allow-lan: true
+mode: rule
+log-level: info
+
+# ========================
+# 节点列表 (会被用户节点替换/追加)
+# ========================
+proxies:
+  - name: "示例-HTTP"
+    type: http
+    server: example.com
+    port: 80
+    # 这个节点会被实际节点替换
+
+# ========================
+# 策略组 (分流逻辑)
+# ========================
+proxy-groups:
+  - name: "🚀 节点选择"
+    type: select
+    proxies:
+      - ♻️ 自动选择
+      - 🎯 全球直连
+      - DIRECT
+
+  - name: "♻️ 自动选择"
+    type: url-test
+    proxies:
+      - 示例-HTTP
+    url: "http://www.gstatic.com/generate_204"
+    interval: 300
+
+  - name: "🎯 全球直连"
+    type: select
+    proxies:
+      - DIRECT
+
+# ========================
+# 分流规则 (从上至下匹配)
+# ========================
+rules:
+  # 广告拦截
+  - DOMAIN-SUFFIX,googleadservices.com,REJECT
+  - DOMAIN-SUFFIX,googlesyndication.com,REJECT
+
+  # 国外网站走代理
+  - DOMAIN-SUFFIX,google.com,🚀 节点选择
+  - DOMAIN-SUFFIX,youtube.com,🚀 节点选择
+  - DOMAIN-SUFFIX,twitter.com,🚀 节点选择
+  - DOMAIN-SUFFIX,facebook.com,🚀 节点选择
+
+  # 国内网站直连
+  - DOMAIN-SUFFIX,baidu.com,🎯 全球直连
+  - DOMAIN-SUFFIX,qq.com,🎯 全球直连
+  - DOMAIN-SUFFIX,taobao.com,🎯 全球直连
+
+  # 局域网直连
+  - IP-CIDR,127.0.0.0/8,🎯 全球直连
+  - IP-CIDR,10.0.0.0/8,🎯 全球直连
+  - IP-CIDR,172.16.0.0/12,🎯 全球直连
+  - IP-CIDR,192.168.0.0/16,🎯 全球直连
+
+  # 默认规则
+  - MATCH,🚀 节点选择

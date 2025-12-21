@@ -1,0 +1,64 @@
+name: yaml-merger-mcp
+version: 1.0.0
+description: YAML Config Merger Tool MCP Server - 自动执行合并、环境搭建、文件操作
+
+servers:
+  # 文件系统MCP - 处理文件读取、目录创建、配置验证
+  filesystem:
+    name: "YAML Merger File System"
+    description: "文件系统操作 - 检查文件存在、读取配置、创建目录"
+    command: "npx"
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "/Users/apple/Documents/xiangmu/YAML-Config-Merger-Tool"]
+    env: {}
+
+  # 命令行执行MCP - 执行Python合并命令、环境搭建
+  command-executor:
+    name: "YAML Merger Command Executor"
+    description: "命令行执行 - 运行yaml_merger.py、安装依赖、验证环境"
+    command: "npx"
+    args: ["-y", "@modelcontextprotocol/server-command-line"]
+    env:
+      PROJECT_ROOT: "/Users/apple/Documents/xiangmu/YAML-Config-Merger-Tool"
+      PYTHONPATH: "/Users/apple/Documents/xiangmu/YAML-Config-Merger-Tool"
+
+# 工具绑定配置（基于技能文档）
+tool_bindings:
+  # yaml-merge-auto-execute-mcp 技能绑定
+  yaml-merge-auto-execute:
+    description: "自动执行YAML配置合并并验证结果"
+    required_servers:
+      - filesystem
+      - command-executor
+    command_templates:
+      merge_configs: "cd {PROJECT_ROOT} && source venv/bin/activate && python yaml_merger.py --input {input_files} --output {output_file} {extra_params}"
+      validate_yaml: "python -c \"import yaml; yaml.safe_load(open('{output_file}', 'r', encoding='utf-8'))\""
+      create_directory: "mkdir -p {output_dir}"
+    file_operations:
+      check_input_exists: "检查输入文件是否存在"
+      read_merged_config: "读取合并后的配置内容"
+      compare_configs: "对比源配置与合并结果"
+
+  # yaml-project-env-setup-mcp 技能绑定
+  yaml-project-env-setup:
+    description: "项目环境搭建与依赖安装"
+    required_servers:
+      - filesystem
+      - command-executor
+    command_templates:
+      check_python_version: "python --version"
+      install_dependencies: "cd {PROJECT_ROOT} && pip install -r requirements.txt"
+      verify_dependency: "pip list | grep pyyaml"
+      create_venv: "cd {PROJECT_ROOT} && python3 -m venv venv"
+      activate_venv: "source venv/bin/activate"
+    file_operations:
+      check_requirements: "检查requirements.txt是否存在"
+      check_entry_file: "检查yaml_merger.py入口文件"
+      read_requirements: "读取requirements.txt依赖清单"
+
+# 约束条件配置
+constraints:
+  max_merge_files: 5
+  max_file_size_mb: 10
+  allowed_extensions: [".yaml", ".yml"]
+  require_trust_dialog: true
+  safe_commands_only: true  # 禁用sudo等高危命令

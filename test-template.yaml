@@ -1,0 +1,34 @@
+# Template Configuration
+mixed-port: 7890
+allow-lan: true
+mode: rule
+log-level: info
+
+# ========================
+# 节点列表
+# ========================
+proxies:
+  - name: "Template-Proxy"
+    type: http
+    server: example.com
+    port: 80
+    username: user
+    password: pass
+
+# ========================
+# 策略组
+# ========================
+proxy-groups:
+  - name: "Proxy"
+    type: select
+    proxies:
+      - Template-Proxy
+      - DIRECT
+
+# ========================
+# 分流规则
+# ========================
+rules:
+  - DOMAIN-SUFFIX,google.com,Proxy
+  - DOMAIN-SUFFIX,gmail.com,Proxy
+  - GEOIP,CN,DIRECT

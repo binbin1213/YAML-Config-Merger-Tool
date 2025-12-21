@@ -1,0 +1,32 @@
+# User Configuration
+mixed-port: 8080
+external-controller: "127.0.0.1:9090"
+
+proxies:
+  - name: "User-Proxy-1"
+    type: ss
+    server: user-server1.com
+    port: 8388
+    cipher: aes-256-gcm
+    password: userpass1
+
+  - name: "User-Proxy-2"
+    type: vmess
+    server: user-server2.com
+    port: 443
+    uuid: 12345678-1234-1234-1234-123456789abc
+    alterId: 0
+    cipher: auto
+
+proxy-groups:
+  - name: "Auto"
+    type: url-test
+    proxies:
+      - User-Proxy-1
+      - User-Proxy-2
+    url: "http://www.gstatic.com/generate_204"
+    interval: 300
+
+rules:
+  - DOMAIN-SUFFIX,facebook.com,Auto
+  - DOMAIN-SUFFIX,twitter.com,Auto

@@ -1,0 +1,35 @@
+# 用户配置 - 机场订阅节点
+external-controller: "127.0.0.1:9090"
+
+# 机场节点
+proxies:
+  - name: "HK-01-香港"
+    type: ss
+    server: hk01.example-airline.com
+    port: 8388
+    cipher: aes-256-gcm
+    password: airline_password_01
+
+  - name: "SG-01-新加坡"
+    type: vmess
+    server: sg01.example-airline.com
+    port: 443
+    uuid: 12345678-abcd-1234-abcd-123456789abc
+    alterId: 0
+    cipher: auto
+    tls: true
+    skip-cert-verify: true
+
+  - name: "US-01-美国"
+    type: trojan
+    server: us01.example-airline.com
+    port: 443
+    password: trojan_password_01
+    sni: us01.example-airline.com
+    skip-cert-verify: true
+
+# 额外的分流规则
+rules:
+  - DOMAIN-SUFFIX,instagram.com,🚀 节点选择
+  - DOMAIN-SUFFIX,netflix.com,🚀 节点选择
+  - DOMAIN-SUFFIX,openai.com,🚀 节点选择

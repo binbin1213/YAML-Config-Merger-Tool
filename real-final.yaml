@@ -1,0 +1,79 @@
+# 混合端口 (HTTP/SOCKS5)
+mixed-port: 7890
+# 允许局域网连接
+allow-lan: true
+# 运行模式 (rule/global/direct)
+mode: rule
+log-level: info
+
+# ========================
+# 节点列表
+# ========================
+proxies:
+- name: 示例-HTTP
+  type: http
+  server: example.com
+  port: 80
+- name: HK-01-香港
+  type: ss
+  server: hk01.example-airline.com
+  port: 8388
+  cipher: aes-256-gcm
+  password: airline_password_01
+- name: SG-01-新加坡
+  type: vmess
+  server: sg01.example-airline.com
+  port: 443
+  uuid: 12345678-abcd-1234-abcd-123456789abc
+  alterId: 0
+  cipher: auto
+  tls: true
+  skip-cert-verify: true
+- name: US-01-美国
+  type: trojan
+  server: us01.example-airline.com
+  port: 443
+  password: trojan_password_01
+  sni: us01.example-airline.com
+  skip-cert-verify: true
+
+# ========================
+# 策略组 (分流逻辑)
+# ========================
+proxy-groups:
+- name: 🚀 节点选择
+  type: select
+  proxies:
+  - ♻️ 自动选择
+  - 🎯 全球直连
+  - DIRECT
+- name: ♻️ 自动选择
+  type: url-test
+  proxies:
+  - 示例-HTTP
+  url: http://www.gstatic.com/generate_204
+  interval: 300
+- name: 🎯 全球直连
+  type: select
+  proxies:
+  - DIRECT
+
+# ========================
+# 分流规则 (从上至下匹配)
+# ========================
+rules:
+- IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+- IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+- IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+- IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+- IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+- DOMAIN-SUFFIX,googleadservices.com,REJECT
+- DOMAIN-SUFFIX,googlesyndication.com,REJECT
+- DOMAIN-SUFFIX,google.com,🚀 节点选择
+- DOMAIN-SUFFIX,youtube.com,🚀 节点选择
+- DOMAIN-SUFFIX,twitter.com,🚀 节点选择
+- DOMAIN-SUFFIX,facebook.com,🚀 节点选择
+- DOMAIN-SUFFIX,baidu.com,🎯 全球直连
+- DOMAIN-SUFFIX,qq.com,🎯 全球直连
+- DOMAIN-SUFFIX,taobao.com,🎯 全球直连
+- MATCH,🚀 节点选择

@@ -1,0 +1,54 @@
+# 混合端口 (HTTP/SOCKS5)
+mixed-port: 7890
+# 允许局域网连接
+allow-lan: true
+# 运行模式 (rule/global/direct)
+mode: rule
+log-level: info
+
+# ========================
+# 节点列表
+# ========================
+proxies:
+- name: Template-Proxy
+  type: http
+  server: example.com
+  port: 80
+  username: user
+  password: pass
+- name: User-Proxy-1
+  type: ss
+  server: user-server1.com
+  port: 8388
+  cipher: aes-256-gcm
+  password: userpass1
+- name: User-Proxy-2
+  type: vmess
+  server: user-server2.com
+  port: 443
+  uuid: 12345678-1234-1234-1234-123456789abc
+  alterId: 0
+  cipher: auto
+
+# ========================
+# 策略组 (分流逻辑)
+# ========================
+proxy-groups:
+- name: Proxy
+  type: select
+  proxies:
+  - Template-Proxy
+  - DIRECT
+
+# ========================
+# 分流规则 (从上至下匹配)
+# ========================
+rules:
+- IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+- IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+- IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+- IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+- IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+- DOMAIN-SUFFIX,google.com,Proxy
+- DOMAIN-SUFFIX,gmail.com,Proxy
+- GEOIP,CN,DIRECT

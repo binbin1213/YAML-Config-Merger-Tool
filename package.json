@@ -1,0 +1,43 @@
+{
+  "name": "yaml-config-merger-tool",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "tailwind:watch": "tailwindcss -i ./src/styles.css -o ./src/tailwind-output.css --watch",
+    "tailwind:build": "tailwindcss -i ./src/styles.css -o ./src/tailwind-output.css --minify",
+    "dev": "npm run tailwind:build && concurrently \"npm run tailwind:watch\" \"ng serve --hmr\"",
+    "build": "npm run tailwind:build && ng build",
+    "build:prod": "npm run tailwind:build && ng build --configuration=production",
+    "preview": "ng serve --configuration=production",
+    "preview:prod": "ng serve --configuration=production --port 8080",
+    "lint": "ng lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@angular/build": "^21.0.0",
+    "@angular/cli": "^21.0.0",
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/compiler-cli": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.3",
+    "@angular/platform-browser": "^21.0.0",
+    "@types/prismjs": "^1.26.5",
+    "prism-themes": "^1.9.0",
+    "prismjs": "^1.30.0",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "angular-eslint": "21.1.0",
+    "autoprefixer": "^10.4.22",
+    "concurrently": "^8.2.2",
+    "eslint": "^9.39.1",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.18",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "8.47.0",
+    "vite": "^6.2.0"
+  }
+}
