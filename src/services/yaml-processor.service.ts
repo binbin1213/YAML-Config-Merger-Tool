@@ -1,6 +1,33 @@
 
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError, timeout, catchError } from 'rxjs';
 
+// API接口定义
+interface MergeRequest {
+  template: string;
+  user: string;
+  options?: {
+    compatibility_mode?: boolean;
+    array_strategy?: string;
+    keep_comments?: boolean;
+    verbose?: boolean;
+  };
+}
+
+interface MergeResponse {
+  success: boolean;
+  result?: string;
+  error?: string;
+  stats?: any;
+}
+
+interface ValidateResponse {
+  valid: boolean;
+  error?: string;
+}
+
+// 保留原有的类型定义以防备用
 // Declare global jsyaml from the CDN script
 interface JsYamlOptions {
   lineWidth?: number;
@@ -85,7 +112,34 @@ export interface MihomoConfig {
 })
 export class YamlProcessorService {
 
+  // 智能检测API URL：开发环境使用相对路径，生产环境使用完整URL
+  private get apiUrl(): string {
+    // 如果在浏览器环境中运行
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      const port = window.location.port;
+
+      // 开发环境：如果是localhost:3000（nginx代理），使用相对路径
+      if (hostname === 'localhost' && port === '3000') {
+        return '/api';
+      }
+
+      // 如果是localhost:8080（直接访问API），使用完整路径
+      if (hostname === 'localhost' && port === '8080') {
+        return 'http://localhost:8080/api';
+      }
+
+      // 生产环境或其他情况，使用相对路径（假设nginx代理配置正确）
+      return '/api';
+    }
+
+    // 服务器端渲染或其他情况，回退到默认值
+    return 'http://localhost:8080/api';
+  }
+
   private highlightedKeys = new Set<string>(); // 用于跟踪需要高亮的键
+
+  constructor(private http: HttpClient) {}
 
   private getDirectTarget(config: MihomoConfig): string {
     const proxyNames = (config.proxies ?? []).map(p => p.name);
@@ -199,11 +253,58 @@ export class YamlProcessorService {
     return processedLines.join('\n');
   }
 
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    console.error('API Error:', error);
+    let errorMessage = 'Unknown error occurred';
+
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Server-side error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+
+    return throwError(() => errorMessage);
+  }
+
   /**
-   * Merges user proxies into the template.
+   * 通过MCP API调用Python CLI工具进行YAML合并
+   * @param templateYaml 模板YAML配置
+   * @param userYaml 用户YAML配置
+   * @param compatibilityMode 兼容模式
+   * @returns Observable<string> 合并后的YAML字符串
+   */
+  mergeConfigsViaAPI(templateYaml: string, userYaml: string, compatibilityMode = false): Observable<string> {
+    if (!templateYaml || !userYaml) {
+      return new Observable(observer => {
+        observer.next('');
+        observer.complete();
+      });
+    }
+
+    const request: MergeRequest = {
+      template: templateYaml,
+      user: userYaml,
+      options: {
+        compatibility_mode: compatibilityMode,
+        array_strategy: 'append',
+        keep_comments: true,
+        verbose: false
+      }
+    };
+
+    return this.http.post<MergeResponse>(`${this.apiUrl}/merge`, request).pipe(
+      timeout(30000), // 30秒超时
+      catchError(this.handleError.bind(this))
+    );
+  }
+
+  /**
+   * 本地回退方法：通过js-yaml进行YAML合并
    * @param compatibilityMode If true, polyfills 'include-all' regex and downgrades 'smart' to 'url-test'
    */
-  mergeConfigs(templateYaml: string, userYaml: string, compatibilityMode = false): string {
+  mergeConfigsLocally(templateYaml: string, userYaml: string, compatibilityMode = false): string {
     if (!templateYaml || !userYaml) return '';
 
     this.highlightedKeys.clear(); // 清除之前的记录
@@ -222,7 +323,7 @@ export class YamlProcessorService {
 
     // 2. Extract User Proxies
     const userProxies = Array.isArray(user.proxies) ? user.proxies : [];
-    
+
     // 3. Inject User Proxies into Template Proxies
     const templateProxies = Array.isArray(template.proxies) ? template.proxies : [];
     result.proxies = [...templateProxies, ...userProxies];
@@ -232,18 +333,18 @@ export class YamlProcessorService {
 
     // 4. Handle Proxy Groups (The complex part)
     if (result['proxy-groups'] && Array.isArray(result['proxy-groups'])) {
-      
+
       // Get a list of all available proxy names for filtering
       const allProxyNames = result.proxies.map(p => p.name);
 
       result['proxy-groups'] = result['proxy-groups'].map(group => {
-        
+
         // --- Logic 1: Handle include-all and Regex Filters ---
         // If we are in compatibility mode OR the group specifies include-all
         // (Even in non-compat mode, some basic logic helps, but strictly:
         //  Compat Mode = Execute Regex in JS, Remove params from YAML
         //  Native Mode = Keep params in YAML, let Core handle it)
-        
+
         if (compatibilityMode && group['include-all']) {
           let matches: string[] = [];
 
@@ -262,7 +363,7 @@ export class YamlProcessorService {
 
           // Ensure proxies array exists
           if (!group.proxies) group.proxies = [];
-          
+
           // Add matches to the group's proxies list, avoiding duplicates
           const existing = new Set(group.proxies);
           matches.forEach(m => {
@@ -280,7 +381,7 @@ export class YamlProcessorService {
         if (compatibilityMode && group.type === 'smart') {
           // Downgrade to url-test (Auto Select)
           group.type = 'url-test';
-          
+
           // Remove smart-specific keys that might cause errors
           delete group['policy-priority'];
           delete group['uselightgbm'];
@@ -307,7 +408,7 @@ export class YamlProcessorService {
       }
     } else {
       // If template has dummy providers (indicated by placeholders), remove them if user didn't supply real ones
-      // or just keep them if they look real? 
+      // or just keep them if they look real?
       if (result['proxy-providers']) {
         const providers = result['proxy-providers'];
         const hasPlaceholderUrl = Object.values(providers).some(provider => {
@@ -327,6 +428,93 @@ export class YamlProcessorService {
     this.ensureLanBypassRules(result);
 
     return this.dump(result);
+  }
+
+  /**
+   * 主要的合并方法：优先使用API，失败时回退到本地处理
+   * @param templateYaml 模板YAML配置
+   * @param userYaml 用户YAML配置
+   * @param compatibilityMode 兼容模式
+   * @returns Promise<string> 合并后的YAML字符串
+   */
+  async mergeConfigs(templateYaml: string, userYaml: string, compatibilityMode = false): Promise<string> {
+    if (!templateYaml || !userYaml) return '';
+
+    try {
+      // 尝试使用API进行合并
+      console.log('尝试使用MCP API进行YAML合并...');
+
+      const response = await new Promise<MergeResponse>((resolve, reject) => {
+        this.mergeConfigsViaAPI(templateYaml, userYaml, compatibilityMode).subscribe({
+          next: (response) => resolve(response),
+          error: (error) => reject(error)
+        });
+      });
+
+      if (response.success && response.result) {
+        console.log('MCP API合并成功');
+
+        // 解析结果以提取高亮信息
+        try {
+          const result = this.parse(response.result);
+
+          // 记录用户配置中的顶级键用于高亮
+          const user = this.parse(userYaml);
+          this.highlightedKeys.clear();
+          for (const key in user) {
+            if (Object.prototype.hasOwnProperty.call(user, key)) {
+              this.highlightedKeys.add(key);
+            }
+          }
+
+          // 如果有代理，添加proxies键
+          if (user.proxies && Array.isArray(user.proxies) && user.proxies.length > 0) {
+            this.highlightedKeys.add('proxies');
+          }
+
+          // 如果有代理提供者，添加proxy-providers键
+          if (user['proxy-providers']) {
+            this.highlightedKeys.add('proxy-providers');
+            for (const providerName in user['proxy-providers']) {
+              if (Object.prototype.hasOwnProperty.call(user['proxy-providers'], providerName)) {
+                this.highlightedKeys.add(providerName);
+              }
+            }
+          }
+
+        } catch (parseError) {
+          console.warn('解析API结果时出错:', parseError);
+        }
+
+        return response.result;
+      } else {
+        throw new Error(response.error || 'API返回了错误结果');
+      }
+    } catch (apiError) {
+      console.warn('MCP API调用失败，回退到本地处理:', apiError);
+
+      // API失败时回退到本地处理
+      try {
+        return this.mergeConfigsLocally(templateYaml, userYaml, compatibilityMode);
+      } catch (localError) {
+        console.error('本地处理也失败:', localError);
+        throw new Error(`API和本地处理都失败。API错误: ${apiError}, 本地错误: ${localError}`);
+      }
+    }
+  }
+
+  /**
+   * 验证YAML配置文件
+   * @param content YAML内容
+   * @returns Observable<ValidateResponse> 验证结果
+   */
+  validateYaml(content: string): Observable<ValidateResponse> {
+    return this.http.post<ValidateResponse>(`${this.apiUrl}/validate`, {
+      content
+    }).pipe(
+      timeout(10000), // 10秒超时
+      catchError(this.handleError.bind(this))
+    );
   }
 
   getHighlightedKeys(): Set<string> {

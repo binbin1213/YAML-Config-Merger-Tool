@@ -1,6 +1,7 @@
 import { Component, signal, inject, AfterViewInit, SecurityContext, ViewChild, ElementRef, effect } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { YamlProcessorService } from '../services/yaml-processor.service';
 import { HighlightService } from '../services/highlight.service';
 
@@ -10,7 +11,7 @@ import 'prismjs/components/prism-yaml';
 @Component({
   selector: 'app-config-merger',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HttpClientModule],
   template: `
     <div class="flex flex-col w-full gap-4 h-full">
       
@@ -279,7 +280,7 @@ export class ConfigMergerComponent implements AfterViewInit {
     }
   }
 
-  processMerge() {
+  async processMerge() {
     if (!this.templateContent() || !this.userContent()) {
        this.statusMessage.set('等待输入...');
        return;
@@ -287,11 +288,16 @@ export class ConfigMergerComponent implements AfterViewInit {
 
     this.statusMessage.set('处理中...');
     try {
-      const result = this.yamlService.mergeConfigs(
-        this.templateContent(), 
+      const result = await this.yamlService.mergeConfigs(
+        this.templateContent(),
         this.userContent(),
         this.compatibilityMode()
       );
+
+      if (!result) {
+        throw new Error('合并结果为空');
+      }
+
       const highlightedKeys = this.yamlService.getHighlightedKeys();
       let highlightedResult = this.highlightService.highlight(result, 'yaml');
       console.log('Highlighted Result:', highlightedResult);
@@ -310,7 +316,8 @@ export class ConfigMergerComponent implements AfterViewInit {
       this.currentStep.set(3);
     } catch (err) {
       console.error('合并失败:', err);
-      this.statusMessage.set('错误：无效的 YAML 格式 ❌');
+      const errorMessage = err instanceof Error ? err.message : '未知错误';
+      this.statusMessage.set(`错误：${errorMessage} ❌`);
     }
   }
 

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAML Merger CLI集成测试</title>
+    <style>
+        body {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            background: #0f172a;
+            color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-title {
+            color: #60a5fa;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 4px;
+            color: #e2e8f0;
+            padding: 10px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        button:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+        }
+        .result {
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: inherit;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #065f46;
+            color: #6ee7b7;
+            border: 1px solid #10b981;
+        }
+        .status.error {
+            background: #7f1d1d;
+            color: #fca5a5;
+            border: 1px solid #ef4444;
+        }
+        .status.info {
+            background: #1e3a8a;
+            color: #93c5fd;
+            border: 1px solid #3b82f6;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 YAML Merger CLI 集成测试</h1>
+
+        <div class="test-section">
+            <div class="test-title">📡 API 状态检查</div>
+            <button onclick="checkApiStatus()">检查API服务状态</button>
+            <div id="api-status"></div>
+        </div>
+
+        <div class="grid">
+            <div class="test-section">
+                <div class="test-title">📄 模板配置 (Template)</div>
+                <textarea id="template" placeholder="在此输入模板YAML...">mixed-port: 7890
+proxies:
+  - name: direct
+    type: direct
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+      - direct</textarea>
+            </div>
+
+            <div class="test-section">
+                <div class="test-title">👤 用户配置 (User Config)</div>
+                <textarea id="user" placeholder="在此输入用户YAML...">proxies:
+  - name: test-proxy
+    type: http
+    server: example.com
+    port: 8080</textarea>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">⚙️ 合并选项</div>
+            <label>
+                <input type="checkbox" id="compatibility-mode"> 兼容模式 (Compatibility Mode)
+            </label>
+            <br><br>
+            <button onclick="testMerge()">🔗 测试合并</button>
+            <button onclick="testValidate()" id="validate-btn">✅ 验证YAML</button>
+            <div id="merge-status"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">✨ 合并结果 (Merged Result)</div>
+            <div id="result" class="result">合并结果将显示在这里...</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">📊 测试结果摘要</div>
+            <div id="summary" class="status info">
+                准备开始测试...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.port === '3000' ? '/api' : 'http://localhost:8080/api';
+
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        async function checkApiStatus() {
+            updateStatus('api-status', '正在检查API状态...', 'info');
+
+            try {
+                const response = await fetch(`${API_BASE}/status`);
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus('api-status', `✅ API服务正常 - 版本: ${data.version || 'unknown'}, 状态: ${data.status || 'ok'}`, 'success');
+                } else {
+                    updateStatus('api-status', `❌ API服务异常 - HTTP ${response.status}`, 'error');
+                }
+            } catch (error) {
+                updateStatus('api-status', `❌ 无法连接到API服务: ${error.message}`, 'error');
+            }
+        }
+
+        async function testMerge() {
+            const template = document.getElementById('template').value;
+            const user = document.getElementById('user').value;
+            const compatibilityMode = document.getElementById('compatibility-mode').checked;
+
+            if (!template || !user) {
+                updateStatus('merge-status', '❌ 请同时输入模板和用户配置', 'error');
+                return;
+            }
+
+            updateStatus('merge-status', '🔄 正在调用CLI API进行合并...', 'info');
+
+            try {
+                const response = await fetch(`${API_BASE}/merge`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        template,
+                        user,
+                        options: {
+                            compatibility_mode: compatibilityMode,
+                            array_strategy: 'append',
+                            keep_comments: true,
+                            verbose: false
+                        }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.result) {
+                    document.getElementById('result').textContent = data.result;
+                    updateStatus('merge-status', `✅ 合并成功！使用了${compatibilityMode ? '兼容' : '原版'}模式`, 'success');
+                    updateSummary('success', `✅ CLI集成测试成功 - ${compatibilityMode ? '兼容' : '原版'}模式`);
+                } else {
+                    updateStatus('merge-status', `❌ 合并失败: ${data.error || '未知错误'}`, 'error');
+                    updateSummary('error', `❌ CLI集成失败: ${data.error || '未知错误'}`);
+                }
+            } catch (error) {
+                updateStatus('merge-status', `❌ API调用失败: ${error.message}`, 'error');
+                updateSummary('error', `❌ CLI集成失败: ${error.message}`);
+            }
+        }
+
+        async function testValidate() {
+            const result = document.getElementById('result').textContent;
+
+            if (!result || result === '合并结果将显示在这里...') {
+                updateStatus('merge-status', '❌ 请先进行合并操作', 'error');
+                return;
+            }
+
+            updateStatus('merge-status', '🔄 正在验证合并结果...', 'info');
+
+            try {
+                const response = await fetch(`${API_BASE}/validate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        content: result
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.valid) {
+                    updateStatus('merge-status', '✅ YAML验证通过！', 'success');
+                } else {
+                    updateStatus('merge-status', `❌ YAML验证失败: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                updateStatus('merge-status', `❌ 验证API调用失败: ${error.message}`, 'error');
+            }
+        }
+
+        function updateSummary(type, message) {
+            const timestamp = new Date().toLocaleTimeString();
+            document.getElementById('summary').innerHTML = `
+                <div class="status ${type}">
+                    [${timestamp}] ${message}
+                </div>
+            `;
+        }
+
+        // 页面加载时自动检查API状态
+        window.addEventListener('load', () => {
+            checkApiStatus();
+            updateSummary('info', '📋 测试页面已加载，开始CLI集成验证...');
+        });
+    </script>
+</body>
+</html>

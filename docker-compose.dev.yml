@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  yaml-merger-api:
+    build: .
+    container_name: yaml-merger-api
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+
+  # 为开发添加一个简单的静态文件服务器
+  web-server:
+    image: nginx:alpine
+    container_name: yaml-merger-web
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./:/usr/share/nginx/html
+    depends_on:
+      - yaml-merger-api
+    restart: unless-stopped
