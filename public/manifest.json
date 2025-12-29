@@ -1,0 +1,22 @@
+{
+  "name": "YAML 配置合并工具",
+  "short_name": "YAML Merger",
+  "description": "基于 Web 的纯前端工具，帮助用户将个人的 Clash/Mihomo 机场订阅自动合并到预设的高级分流规则模版中",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "scope": "/"
+}
